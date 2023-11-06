@@ -1,0 +1,3 @@
+package com.example.unit_testing_fundamentals.exercise3
+
+class IntervalsAdjacencyDetectorTest
