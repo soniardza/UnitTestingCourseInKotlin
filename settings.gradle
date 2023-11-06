@@ -1,0 +1,21 @@
+pluginManagement {
+    repositories {
+        google()
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+rootProject.name = "UnitTestingCourseInKotlin"
+include ':app'
+include ':unit_testing_fundamentals'
+include ':test_driven_development'
+include ':test_doubles_fundamentals'
+include ':mockito_fundamentals'
+include ':unit_testing_in_android'
