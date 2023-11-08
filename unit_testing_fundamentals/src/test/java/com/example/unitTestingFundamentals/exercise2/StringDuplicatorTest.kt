@@ -1,0 +1,3 @@
+package com.example.unitTestingFundamentals.exercise2
+
+class StringDuplicatorTest

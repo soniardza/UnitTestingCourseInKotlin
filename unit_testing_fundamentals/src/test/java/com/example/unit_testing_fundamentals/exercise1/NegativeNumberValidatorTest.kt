@@ -1,3 +1,0 @@
-package com.example.unit_testing_fundamentals.exercise1
-
-class NegativeNumberValidatorTest

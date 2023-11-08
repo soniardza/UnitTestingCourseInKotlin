@@ -1,0 +1,3 @@
+package com.example.testDoublesFundamentals.example5
+
+class UserInputValidatorTest

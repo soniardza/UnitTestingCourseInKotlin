@@ -1,0 +1,3 @@
+package com.example.unitTestingFundamentals.example3
+
+class IntervalsOverlapDetectorTest

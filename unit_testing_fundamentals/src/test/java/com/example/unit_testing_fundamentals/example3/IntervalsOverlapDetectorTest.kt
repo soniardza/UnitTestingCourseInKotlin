@@ -1,3 +1,0 @@
-package com.example.unit_testing_fundamentals.example3
-
-class IntervalsOverlapDetectorTest

@@ -1,0 +1,3 @@
+package com.example.mockitoFundamentals.exercise5
+
+class UpdateUsernameUseCaseSyncTest
