@@ -31,7 +31,7 @@ class StringReverserTest {
     @Test
     @Throws(Exception::class)
     fun reverse_longString_reversedStringReturned() {
-        val result = SUT!!.reverse("Vasiliy Zukanov")
-        Assert.assertThat(result, CoreMatchers.`is`("vonakuZ yilisaV"))
+    val result = SUT!!.reverse("Sonia Rodriguez")
+        Assert.assertThat(result, CoreMatchers.`is`("zeugirdoR ainoS"))
     }
 }
