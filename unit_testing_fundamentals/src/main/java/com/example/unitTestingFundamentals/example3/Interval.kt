@@ -1,20 +1,13 @@
 package com.example.unitTestingFundamentals.example3
 
-class Interval {
-    private var mStart = 0
-    private var mEnd = 0
+class Interval(start: Int, end: Int) {
+    val start: Int
+    val end: Int
 
-    fun Interval(start: Int, end: Int) {
+    init {
         require(start < end) { "invalid interval range" }
-        mStart = start
-        mEnd = end
-    }
-
-    fun getStart(): Int {
-        return mStart
-    }
-
-    fun getEnd(): Int {
-        return mEnd
+        this.start = start
+        this.end = end
     }
 }
+
