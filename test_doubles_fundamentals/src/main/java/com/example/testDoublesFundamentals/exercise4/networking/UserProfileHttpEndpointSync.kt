@@ -9,15 +9,19 @@ interface UserProfileHttpEndpointSync {
      * @throws NetworkErrorException if operation failed due to network error
      */
     @Throws(NetworkErrorException::class)
-    fun getUserProfile(userId: String?): EndpointResult?
+    fun getUserProfile(userId: String): EndpointResult
+
     enum class EndpointResultStatus {
-        SUCCESS, AUTH_ERROR, SERVER_ERROR, GENERAL_ERROR
+        SUCCESS,
+        AUTH_ERROR,
+        SERVER_ERROR,
+        GENERAL_ERROR
     }
 
-    class EndpointResult(
+    data class EndpointResult(
         val status: EndpointResultStatus,
         val userId: String,
         val fullName: String,
-        val imageUrl: String,
+        val imageUrl: String
     )
 }
