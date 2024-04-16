@@ -3,7 +3,7 @@ package com.example.mockitoFundamentals.example8
 class UserMess(
     val fullName: String,
     val address: Address,
-    val phoneNumber: PhoneNumber,
+    val phoneNumber: PhoneNumber
 ) {
 
     fun logOut() {
