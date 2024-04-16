@@ -8,7 +8,7 @@ class UserObject {
     fun connectWith(otherUser: UserObject?) {
         // real implementation here
     }
-    
+
     val connectedUsers: List<UserObject>?
         get() = // real implementation here
             null
