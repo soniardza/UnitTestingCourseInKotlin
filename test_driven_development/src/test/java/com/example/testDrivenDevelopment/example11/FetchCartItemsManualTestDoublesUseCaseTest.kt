@@ -13,19 +13,14 @@ import org.junit.runner.RunWith
 import org.mockito.ArgumentCaptor
 import org.mockito.Captor
 import org.mockito.Mock
-import org.mockito.Mockito.any
-import org.mockito.Mockito.anyInt
-import org.mockito.Mockito.doAnswer
+import org.mockito.Mockito
 import org.mockito.Mockito.verify
-import org.mockito.Mockito.verifyNoMoreInteractions
-import org.mockito.invocation.InvocationOnMock
 import org.mockito.junit.MockitoJUnitRunner
 
 @RunWith(MockitoJUnitRunner::class)
-class FetchCartItemsUseCaseTest {
+class FetchCartItemsManualTestDoublesUseCaseTest {
     // region helper fields ------------------------------------------------------------------------
-    @Mock
-    lateinit var getCartItemsHttpEndpointMock: GetCartItemsHttpEndpoint
+    private lateinit var getCartItemsHttpEndpointTd: GetCartItemsHttpEndpointTd
 
     @Mock
     lateinit var listenerMock1: FetchCartItemsUseCase.Listener
@@ -40,22 +35,15 @@ class FetchCartItemsUseCaseTest {
     object MockitoHelper {
         // use this in place of captor.capture() if you are trying to capture an argument that is not nullable
         fun <T> capture(argumentCaptor: ArgumentCaptor<T>): T = argumentCaptor.capture()
-
-        fun <T> anyObject(): T {
-            any<T>()
-            return uninitialized()
-        }
-
-        @Suppress("UNCHECKED_CAST")
-        private fun <T> uninitialized(): T = null as T
     }
-
     // endregion helper fields ---------------------------------------------------------------------
+
     private lateinit var systemUnderTest: FetchCartItemsUseCase
 
     @Before
     fun setup() {
-        systemUnderTest = FetchCartItemsUseCase(getCartItemsHttpEndpointMock)
+        getCartItemsHttpEndpointTd = GetCartItemsHttpEndpointTd()
+        systemUnderTest = FetchCartItemsUseCase(getCartItemsHttpEndpointTd)
         success()
     }
 
@@ -68,15 +56,11 @@ class FetchCartItemsUseCaseTest {
     @Test
     fun fetchCartItems_correctLimitPassedToEndpoint() {
         // Arrange
-        val captor: ArgumentCaptor<Int> = ArgumentCaptor.forClass(Int::class.java)
         // Act
         systemUnderTest.fetchCartItemsAndNotify(LIMIT)
         // Assert
-        verify(getCartItemsHttpEndpointMock).getCartItems(
-            MockitoHelper.capture(captor),
-            MockitoHelper.anyObject(),
-        )
-        assertEquals(LIMIT, captor.value)
+        assertEquals(1, getCartItemsHttpEndpointTd.invocationCount)
+        assertEquals(LIMIT, getCartItemsHttpEndpointTd.lastLimit)
     }
 
     @Test
@@ -105,14 +89,14 @@ class FetchCartItemsUseCaseTest {
         systemUnderTest.unregisterListener(listenerMock2)
         systemUnderTest.fetchCartItemsAndNotify(LIMIT)
         // Assert
-        verify(listenerMock1).onCartItemsFetched(any() as List<CartItem?>?)
-        verifyNoMoreInteractions(listenerMock2)
+        verify(listenerMock1).onCartItemsFetched(Mockito.any() as List<CartItem?>?)
+        Mockito.verifyNoMoreInteractions(listenerMock2)
     }
 
     @Test
     fun fetchCartItems_generalError_observersNotifiedOfFailure() {
         // Arrange
-        generaError()
+        generalError()
         // Act
         systemUnderTest.registerListener(listenerMock1)
         systemUnderTest.registerListener(listenerMock2)
@@ -143,33 +127,40 @@ class FetchCartItemsUseCaseTest {
     }
 
     private fun success() {
-        doAnswer { invocation: InvocationOnMock ->
-            val args = invocation.arguments
-            val callback = args[1] as Callback
-            callback.onGetCartItemsSucceeded(getCartItemSchemes())
-            null
-        }.`when`(getCartItemsHttpEndpointMock).getCartItems(anyInt(), MockitoHelper.anyObject())
+        // no-op
     }
 
     private fun networkError() {
-        doAnswer { invocation: InvocationOnMock ->
-            val args = invocation.arguments
-            val callback = args[1] as Callback
-            callback.onGetCartItemsFailed(NETWORK_ERROR)
-            null
-        }.`when`(getCartItemsHttpEndpointMock).getCartItems(anyInt(), MockitoHelper.anyObject())
+        getCartItemsHttpEndpointTd.networkError = true
     }
 
-    private fun generaError() {
-        doAnswer { invocation: InvocationOnMock ->
-            val args = invocation.arguments
-            val callback = args[1] as Callback
-            callback.onGetCartItemsFailed(GENERAL_ERROR)
-            null
-        }.`when`(getCartItemsHttpEndpointMock).getCartItems(anyInt(), MockitoHelper.anyObject())
+    private fun generalError() {
+        getCartItemsHttpEndpointTd.generalError = true
     }
 
     // endregion helper methods --------------------------------------------------------------------
+    // region helper classes -----------------------------------------------------------------------
+    inner class GetCartItemsHttpEndpointTd : GetCartItemsHttpEndpoint {
+        var invocationCount = 0
+        var lastLimit = 0
+        var networkError = false
+        var generalError = false
+
+        override fun getCartItems(
+            limit: Int,
+            callback: Callback,
+        ) {
+            invocationCount++
+            lastLimit = limit
+            if (networkError) {
+                callback.onGetCartItemsFailed(NETWORK_ERROR)
+            } else if (generalError) {
+                callback.onGetCartItemsFailed(GENERAL_ERROR)
+            } else {
+                callback.onGetCartItemsSucceeded(getCartItemSchemes())
+            }
+        }
+    } // endregion helper classes ------------------------------------------------------------------
 
     companion object {
         // region constants ------------------------------------------------------------------------

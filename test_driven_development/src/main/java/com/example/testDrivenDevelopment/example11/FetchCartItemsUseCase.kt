@@ -4,16 +4,20 @@ import com.example.testDrivenDevelopment.example11.cart.CartItem
 import com.example.testDrivenDevelopment.example11.networking.CartItemSchema
 import com.example.testDrivenDevelopment.example11.networking.GetCartItemsHttpEndpoint
 import com.example.testDrivenDevelopment.example11.networking.GetCartItemsHttpEndpoint.FailReason
+import com.example.testDrivenDevelopment.example11.networking.GetCartItemsHttpEndpoint.FailReason.GENERAL_ERROR
+import com.example.testDrivenDevelopment.example11.networking.GetCartItemsHttpEndpoint.FailReason.NETWORK_ERROR
 
-class FetchCartItemsUseCase(private val mGetCartItemsHttpEndpoint: GetCartItemsHttpEndpoint) {
+class FetchCartItemsUseCase(private val getCartItemsHttpEndpoint: GetCartItemsHttpEndpoint) {
     interface Listener {
         fun onCartItemsFetched(capture: List<CartItem?>?)
+
         fun onFetchCartItemsFailed()
     }
 
-    private val mListeners: MutableList<Listener> = ArrayList()
+    private val listeners = mutableListOf<Listener>()
+
     fun fetchCartItemsAndNotify(limit: Int) {
-        mGetCartItemsHttpEndpoint.getCartItems(
+        getCartItemsHttpEndpoint.getCartItems(
             limit,
             object : GetCartItemsHttpEndpoint.Callback {
                 override fun onGetCartItemsSucceeded(cartItems: List<CartItemSchema?>?) {
@@ -22,8 +26,8 @@ class FetchCartItemsUseCase(private val mGetCartItemsHttpEndpoint: GetCartItemsH
 
                 override fun onGetCartItemsFailed(failReason: FailReason?) {
                     when (failReason) {
-                        FailReason.GENERAL_ERROR, FailReason.NETWORK_ERROR -> notifyFailed()
-                        else -> {}
+                        GENERAL_ERROR, NETWORK_ERROR -> notifyFailed()
+                        else -> throw RuntimeException("invalid endpoint result: $failReason")
                     }
                 }
             },
@@ -31,37 +35,41 @@ class FetchCartItemsUseCase(private val mGetCartItemsHttpEndpoint: GetCartItemsH
     }
 
     private fun notifySucceeded(cartItems: List<CartItemSchema?>?) {
-        for (listener in mListeners) {
+        for (listener in listeners) {
             listener.onCartItemsFetched(cartItemsFromSchemas(cartItems))
         }
     }
 
     private fun notifyFailed() {
-        for (listener in mListeners) {
+        for (listener in listeners) {
             listener.onFetchCartItemsFailed()
         }
     }
 
     private fun cartItemsFromSchemas(cartItemSchemas: List<CartItemSchema?>?): List<CartItem?> {
-        val cartItems: MutableList<CartItem?> = ArrayList()
-        for (schema in cartItemSchemas!!) {
-            cartItems.add(
-                CartItem(
-                    schema!!.id,
-                    schema.title,
-                    schema.description,
-                    schema.price,
-                ),
-            )
+        val cartItems = mutableListOf<CartItem>()
+        if (cartItemSchemas != null) {
+            for (schema in cartItemSchemas) {
+                if (schema != null) {
+                    cartItems.add(
+                        CartItem(
+                            schema.id,
+                            schema.title,
+                            schema.description,
+                            schema.price,
+                        ),
+                    )
+                }
+            }
         }
         return cartItems
     }
 
     fun registerListener(listener: Listener) {
-        mListeners.add(listener)
+        listeners.add(listener)
     }
 
     fun unregisterListener(listener: Listener) {
-        mListeners.remove(listener)
+        listeners.remove(listener)
     }
 }
