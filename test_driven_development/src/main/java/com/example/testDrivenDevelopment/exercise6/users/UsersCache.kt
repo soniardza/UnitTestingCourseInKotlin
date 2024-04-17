@@ -1,4 +1,4 @@
-package com.example.testDrivenDevelopment.exercise6.User
+package com.example.testDrivenDevelopment.exercise6.users
 
 import androidx.annotation.Nullable
 

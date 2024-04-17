@@ -1,21 +1,18 @@
 package com.example.testDrivenDevelopment.exercise6
 
-import com.example.testDrivenDevelopment.exercise6.User.User
+import com.example.testDrivenDevelopment.exercise6.users.User
 
-internal interface FetchUserUseCaseSync {
+interface FetchUserUseCaseSync {
     enum class Status {
-        SUCCESS, FAILURE, NETWORK_ERROR
+        SUCCESS,
+        FAILURE,
+        NETWORK_ERROR,
     }
 
-    class UseCaseResult(
+    data class UseCaseResult(
         val status: Status,
-        var user: User,
-    ) {
-
-        init {
-            user = user
-        }
-    }
+        val user: User?,
+    )
 
     fun fetchUserSync(userId: String?): UseCaseResult?
 }
