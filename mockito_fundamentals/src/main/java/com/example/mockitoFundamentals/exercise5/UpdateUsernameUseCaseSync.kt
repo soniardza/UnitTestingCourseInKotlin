@@ -4,47 +4,45 @@ import com.example.mockitoFundamentals.exercise5.eventbus.EventBusPoster
 import com.example.mockitoFundamentals.exercise5.eventbus.UserDetailsChangedEvent
 import com.example.mockitoFundamentals.exercise5.networking.NetworkErrorException
 import com.example.mockitoFundamentals.exercise5.networking.UpdateUsernameHttpEndpointSync
+import com.example.mockitoFundamentals.exercise5.networking.UpdateUsernameHttpEndpointSync.EndpointResult
+import com.example.mockitoFundamentals.exercise5.networking.UpdateUsernameHttpEndpointSync.EndpointResultStatus
 import com.example.mockitoFundamentals.exercise5.users.User
 import com.example.mockitoFundamentals.exercise5.users.UsersCache
 
 class UpdateUsernameUseCaseSync(
-    private val mUpdateUsernameHttpEndpointSync: UpdateUsernameHttpEndpointSync,
-    private val mUsersCache: UsersCache,
-    eventBusPoster: EventBusPoster,
+    private val updateUsernameHttpEndpointSync: UpdateUsernameHttpEndpointSync,
+    private val usersCache: UsersCache,
+    private val eventBusPoster: EventBusPoster,
 ) {
     enum class UseCaseResult {
-        SUCCESS, FAILURE, NETWORK_ERROR
+        SUCCESS,
+        FAILURE,
+        NETWORK_ERROR
     }
 
-    private val mEventBusPoster: EventBusPoster
-
-    init {
-        mEventBusPoster = eventBusPoster
-    }
 
     fun updateUsernameSync(userId: String?, username: String?): UseCaseResult {
-        var endpointResult: UpdateUsernameHttpEndpointSync.EndpointResult? = null
+        val endpointResult: EndpointResult?
         try {
-            endpointResult = mUpdateUsernameHttpEndpointSync.updateUsername(userId, username)
+            endpointResult = updateUsernameHttpEndpointSync.updateUsername(userId, username)
         } catch (e: NetworkErrorException) {
-            // the bug here is "swallowed" exception instead of return
+            // the bug here was "swallowed" exception instead of return
+            return UseCaseResult.NETWORK_ERROR
         }
         return if (isSuccessfulEndpointResult(endpointResult)) {
-            // the bug here is reversed arguments
-            val user = endpointResult?.let { User(it.username, endpointResult.userId) }
-            mEventBusPoster.postEvent(UserDetailsChangedEvent(User(userId, username)))
-            mUsersCache.cacheUser(user)
+            // the bug here was reversed arguments
+            val user = endpointResult?.let { User(it.userId, it.username) }
+//            val user = User(endpointResult?.username, endpointResult?.userId)
+            eventBusPoster.postEvent(UserDetailsChangedEvent(User(userId, username)))
+            usersCache.cacheUser(user)
             UseCaseResult.SUCCESS
         } else {
             UseCaseResult.FAILURE
         }
     }
 
-    private fun isSuccessfulEndpointResult(endpointResult: UpdateUsernameHttpEndpointSync.EndpointResult?): Boolean {
-        // the bug here is the wrong definition of successful response
-        return (
-            endpointResult?.status === UpdateUsernameHttpEndpointSync.EndpointResultStatus.SUCCESS ||
-                endpointResult?.status === UpdateUsernameHttpEndpointSync.EndpointResultStatus.GENERAL_ERROR
-            )
+    private fun isSuccessfulEndpointResult(endpointResult: EndpointResult?): Boolean {
+        // the bug here was the wrong definition of successful response
+        return endpointResult?.status == EndpointResultStatus.SUCCESS
     }
 }

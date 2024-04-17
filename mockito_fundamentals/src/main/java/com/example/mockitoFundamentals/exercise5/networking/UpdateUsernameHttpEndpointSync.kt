@@ -8,15 +8,18 @@ interface UpdateUsernameHttpEndpointSync {
      */
     @Throws(NetworkErrorException::class)
     fun updateUsername(userId: String?, username: String?): EndpointResult?
+
     enum class EndpointResultStatus {
-        SUCCESS, AUTH_ERROR, SERVER_ERROR, GENERAL_ERROR
+        SUCCESS,
+        AUTH_ERROR,
+        SERVER_ERROR,
+        GENERAL_ERROR
     }
 
     class EndpointResult(
         val status: EndpointResultStatus,
-        val username: String,
         val userId: String,
-        private val mUsername: String,
+        val username: String
     )
 }
 
