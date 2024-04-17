@@ -1,6 +1,10 @@
 package com.example.testDrivenDevelopment.example9
 
 import com.example.testDrivenDevelopment.example9.networking.AddToCartHttpEndpointSync
+import com.example.testDrivenDevelopment.example9.networking.AddToCartHttpEndpointSync.EndpointResult
+import com.example.testDrivenDevelopment.example9.networking.AddToCartHttpEndpointSync.EndpointResult.AUTH_ERROR
+import com.example.testDrivenDevelopment.example9.networking.AddToCartHttpEndpointSync.EndpointResult.GENERAL_ERROR
+import com.example.testDrivenDevelopment.example9.networking.AddToCartHttpEndpointSync.EndpointResult.SUCCESS
 import com.example.testDrivenDevelopment.example9.networking.CartItemScheme
 import com.example.testDrivenDevelopment.example9.networking.NetworkErrorException
 
@@ -15,7 +19,7 @@ class AddToCartUseCaseSync(private val addToCartHttpEndpointSync: AddToCartHttpE
         offerId: String,
         amount: Int,
     ): UseCaseResult {
-        val result: AddToCartHttpEndpointSync.EndpointResult?
+        val result: EndpointResult?
 
         try {
             result = addToCartHttpEndpointSync.addToCartSync(CartItemScheme(offerId, amount))
@@ -24,10 +28,8 @@ class AddToCartUseCaseSync(private val addToCartHttpEndpointSync: AddToCartHttpE
         }
 
         return when (result) {
-            AddToCartHttpEndpointSync.EndpointResult.SUCCESS -> UseCaseResult.SUCCESS
-            AddToCartHttpEndpointSync.EndpointResult.AUTH_ERROR,
-            AddToCartHttpEndpointSync.EndpointResult.GENERAL_ERROR,
-            -> UseCaseResult.FAILURE
+            SUCCESS -> UseCaseResult.SUCCESS
+            AUTH_ERROR, GENERAL_ERROR -> UseCaseResult.FAILURE
             else -> throw RuntimeException("invalid endpoint result: $result")
         }
     }

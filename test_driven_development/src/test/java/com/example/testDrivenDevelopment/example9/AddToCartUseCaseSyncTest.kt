@@ -33,14 +33,12 @@ class AddToCartUseCaseSyncTest {
     private lateinit var systemUnderTest: AddToCartUseCaseSync
 
     @Before
-    @Throws(Exception::class)
     fun setup() {
         systemUnderTest = AddToCartUseCaseSync(addToCartHttpEndpointSyncMock)
         success()
     }
 
     @Test
-    @Throws(Exception::class)
     fun addToCartSync_correctParametersPassedToEndpoint() {
         // Arrange
         val captor: ArgumentCaptor<CartItemScheme> =
@@ -54,7 +52,6 @@ class AddToCartUseCaseSyncTest {
     }
 
     @Test
-    @Throws(Exception::class)
     fun addToCartSync_success_successReturned() {
         // Arrange
         // Act
@@ -64,7 +61,6 @@ class AddToCartUseCaseSyncTest {
     }
 
     @Test
-    @Throws(Exception::class)
     fun addToCartSync_authError_failureReturned() {
         // Arrange
         authError()
@@ -75,7 +71,6 @@ class AddToCartUseCaseSyncTest {
     }
 
     @Test
-    @Throws(Exception::class)
     fun addToCartSync_generalError_failureReturned() {
         // Arrange
         generalError()
@@ -86,7 +81,6 @@ class AddToCartUseCaseSyncTest {
     }
 
     @Test
-    @Throws(Exception::class)
     fun addToCartSync_networkError_networkErrorReturned() {
         // Arrange
         networkError()
@@ -98,23 +92,27 @@ class AddToCartUseCaseSyncTest {
 
     // region helper methods -----------------------------------------------------------------------
     private fun success() {
-        `when`(addToCartHttpEndpointSyncMock.addToCartSync(any(CartItemScheme::class.java)))
-            .thenReturn(SUCCESS)
+        `when`(addToCartHttpEndpointSyncMock.addToCartSync(any(CartItemScheme::class.java))).thenReturn(
+            SUCCESS,
+        )
     }
 
     private fun authError() {
-        `when`(addToCartHttpEndpointSyncMock.addToCartSync(any(CartItemScheme::class.java)))
-            .thenReturn(AUTH_ERROR)
+        `when`(addToCartHttpEndpointSyncMock.addToCartSync(any(CartItemScheme::class.java))).thenReturn(
+            AUTH_ERROR,
+        )
     }
 
     private fun generalError() {
-        `when`(addToCartHttpEndpointSyncMock.addToCartSync(any(CartItemScheme::class.java)))
-            .thenReturn(GENERAL_ERROR)
+        `when`(addToCartHttpEndpointSyncMock.addToCartSync(any(CartItemScheme::class.java))).thenReturn(
+            GENERAL_ERROR,
+        )
     }
 
     private fun networkError() {
-        `when`(addToCartHttpEndpointSyncMock.addToCartSync(any(CartItemScheme::class.java)))
-            .thenThrow(NetworkErrorException())
+        `when`(addToCartHttpEndpointSyncMock.addToCartSync(any(CartItemScheme::class.java))).thenThrow(
+            NetworkErrorException(),
+        )
     }
 
     // endregion helper methods ------------------------------------------------------------------
