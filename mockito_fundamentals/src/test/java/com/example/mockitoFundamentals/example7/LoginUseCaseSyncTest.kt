@@ -25,9 +25,9 @@ class LoginUseCaseSyncTest {
         const val AUTH_TOKEN = "authToken"
     }
 
-    private lateinit var mLoginHttpEndpointSyncMock: LoginHttpEndpointSync
-    private lateinit var mAuthTokenCacheMock: AuthTokenCache
-    private lateinit var mEventBusPosterMock: EventBusPoster
+    private lateinit var loginHttpEndpointSyncMock: LoginHttpEndpointSync
+    private lateinit var authTokenCacheMock: AuthTokenCache
+    private lateinit var eventBusPosterMock: EventBusPoster
 
     private lateinit var systemUnderTest: LoginUseCaseSync
 
@@ -38,10 +38,10 @@ class LoginUseCaseSyncTest {
 
     @Before
     fun setup() {
-        mLoginHttpEndpointSyncMock = mock(LoginHttpEndpointSync::class.java)
-        mAuthTokenCacheMock = mock(AuthTokenCache::class.java)
-        mEventBusPosterMock = mock(EventBusPoster::class.java)
-        systemUnderTest = LoginUseCaseSync(mLoginHttpEndpointSyncMock, mAuthTokenCacheMock, mEventBusPosterMock)
+        loginHttpEndpointSyncMock = mock(LoginHttpEndpointSync::class.java)
+        authTokenCacheMock = mock(AuthTokenCache::class.java)
+        eventBusPosterMock = mock(EventBusPoster::class.java)
+        systemUnderTest = LoginUseCaseSync(loginHttpEndpointSyncMock, authTokenCacheMock, eventBusPosterMock)
         success()
     }
 
@@ -50,7 +50,7 @@ class LoginUseCaseSyncTest {
         val captor: ArgumentCaptor<String> = ArgumentCaptor.forClass(String::class.java)
 
         systemUnderTest.loginSync(USERNAME, PASSWORD)
-        verify(mLoginHttpEndpointSyncMock, times(1)).loginSync(
+        verify(loginHttpEndpointSyncMock, times(1)).loginSync(
             MockitoHelper.capture(captor),
             MockitoHelper.capture(captor)
         )
@@ -64,7 +64,7 @@ class LoginUseCaseSyncTest {
         val captor: ArgumentCaptor<String> = ArgumentCaptor.forClass(String::class.java)
 
         systemUnderTest.loginSync(USERNAME, PASSWORD)
-        verify(mAuthTokenCacheMock).cacheAuthToken(MockitoHelper.capture(captor))
+        verify(authTokenCacheMock).cacheAuthToken(MockitoHelper.capture(captor))
         assertEquals(AUTH_TOKEN, captor.value)
     }
 
@@ -73,28 +73,28 @@ class LoginUseCaseSyncTest {
     fun loginSync_generalError_authTokenNotCached() {
         generalError()
         systemUnderTest.loginSync(USERNAME, PASSWORD)
-        verifyNoMoreInteractions(mAuthTokenCacheMock)
+        verifyNoMoreInteractions(authTokenCacheMock)
     }
 
     @Test
     fun loginSync_authError_authTokenNotCached() {
         authError()
         systemUnderTest.loginSync(USERNAME, PASSWORD)
-        verifyNoMoreInteractions(mAuthTokenCacheMock)
+        verifyNoMoreInteractions(authTokenCacheMock)
     }
 
     @Test
     fun loginSync_serverError_authTokenNotCached() {
         serverError()
         systemUnderTest.loginSync(USERNAME, PASSWORD)
-        verifyNoMoreInteractions(mAuthTokenCacheMock)
+        verifyNoMoreInteractions(authTokenCacheMock)
     }
 
     @Test
     fun loginSync_success_loggedInEventPosted() {
         val captor: ArgumentCaptor<Any> = ArgumentCaptor.forClass(Any::class.java)
         systemUnderTest.loginSync(USERNAME, PASSWORD)
-        verify(mEventBusPosterMock).postEvent(MockitoHelper.capture(captor))
+        verify(eventBusPosterMock).postEvent(MockitoHelper.capture(captor))
         assertEquals(LoggedInEvent::class.java, captor.value?.javaClass)
     }
 
@@ -102,21 +102,21 @@ class LoginUseCaseSyncTest {
     fun loginSync_generalError_noInteractionWithEventBusPoster() {
         generalError()
         systemUnderTest.loginSync(USERNAME, PASSWORD)
-        verifyNoMoreInteractions(mEventBusPosterMock)
+        verifyNoMoreInteractions(eventBusPosterMock)
     }
 
     @Test
     fun loginSync_authError_noInteractionWithEventBusPoster() {
         authError()
         systemUnderTest.loginSync(USERNAME, PASSWORD)
-        verifyNoMoreInteractions(mEventBusPosterMock)
+        verifyNoMoreInteractions(eventBusPosterMock)
     }
 
     @Test
     fun loginSync_serverError_noInteractionWithEventBusPoster() {
         serverError()
         systemUnderTest.loginSync(USERNAME, PASSWORD)
-        verifyNoMoreInteractions(mEventBusPosterMock)
+        verifyNoMoreInteractions(eventBusPosterMock)
     }
 
     @Test
@@ -155,12 +155,12 @@ class LoginUseCaseSyncTest {
 
     private fun networkError() {
         doThrow(NetworkErrorException())
-            .`when`(mLoginHttpEndpointSyncMock)
+            .`when`(loginHttpEndpointSyncMock)
             .loginSync(any(String::class.java), any(String::class.java))
     }
 
     private fun success() {
-        `when`(mLoginHttpEndpointSyncMock.loginSync(USERNAME, PASSWORD))
+        `when`(loginHttpEndpointSyncMock.loginSync(USERNAME, PASSWORD))
             .thenReturn(
                 LoginHttpEndpointSync.EndpointResult(
                     LoginHttpEndpointSync.EndpointResultStatus.SUCCESS,
@@ -170,7 +170,7 @@ class LoginUseCaseSyncTest {
     }
 
     private fun generalError() {
-        `when`(mLoginHttpEndpointSyncMock.loginSync(USERNAME, PASSWORD))
+        `when`(loginHttpEndpointSyncMock.loginSync(USERNAME, PASSWORD))
             .thenReturn(
                 LoginHttpEndpointSync.EndpointResult(
                     LoginHttpEndpointSync.EndpointResultStatus.GENERAL_ERROR,
@@ -180,7 +180,7 @@ class LoginUseCaseSyncTest {
     }
 
     private fun authError() {
-        `when`(mLoginHttpEndpointSyncMock.loginSync(USERNAME, PASSWORD))
+        `when`(loginHttpEndpointSyncMock.loginSync(USERNAME, PASSWORD))
             .thenReturn(
                 LoginHttpEndpointSync.EndpointResult(
                     LoginHttpEndpointSync.EndpointResultStatus.AUTH_ERROR,
@@ -190,7 +190,7 @@ class LoginUseCaseSyncTest {
     }
 
     private fun serverError() {
-        `when`(mLoginHttpEndpointSyncMock.loginSync(USERNAME, PASSWORD))
+        `when`(loginHttpEndpointSyncMock.loginSync(USERNAME, PASSWORD))
             .thenReturn(
                 LoginHttpEndpointSync.EndpointResult(
                     LoginHttpEndpointSync.EndpointResultStatus.SERVER_ERROR,
