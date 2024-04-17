@@ -21,5 +21,3 @@ You should:
 5) Run the tests to make sure that all of them pass after the refactoring.
 6) Refactor the tests code.
 7) Run the tests to make sure that all of them pass after the refactoring.
-
-

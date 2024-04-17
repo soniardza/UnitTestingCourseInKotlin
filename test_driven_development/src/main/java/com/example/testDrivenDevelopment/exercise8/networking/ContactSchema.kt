@@ -1,6 +1,6 @@
 package com.example.testDrivenDevelopment.exercise8.networking
 
-class ContactSchema(
+data class ContactSchema(
     val id: String,
     val fullName: String,
     val fullPhoneNumber: String,
