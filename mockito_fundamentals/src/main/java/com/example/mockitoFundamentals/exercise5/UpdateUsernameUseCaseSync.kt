@@ -32,7 +32,6 @@ class UpdateUsernameUseCaseSync(
         return if (isSuccessfulEndpointResult(endpointResult)) {
             // the bug here was reversed arguments
             val user = endpointResult?.let { User(it.userId, it.username) }
-//            val user = User(endpointResult?.username, endpointResult?.userId)
             eventBusPoster.postEvent(UserDetailsChangedEvent(User(userId, username)))
             usersCache.cacheUser(user)
             UseCaseResult.SUCCESS
