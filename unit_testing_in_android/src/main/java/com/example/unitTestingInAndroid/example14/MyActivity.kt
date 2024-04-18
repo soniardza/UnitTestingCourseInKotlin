@@ -1,13 +1,18 @@
 package com.example.unitTestingInAndroid.example14
 
-import android.app.Activity
+class MyActivity(private val onStartListener: OnStartListener) {
+    private var mCount: Int = 0
 
-class MyActivity : Activity() {
-    var count = 0
-        private set
-
-    override fun onStart() {
-        super.onStart()
-        count++
+    fun onStart() {
+        onStartListener.onStart()
+        mCount++
     }
+
+    fun getCount(): Int {
+        return mCount
+    }
+}
+
+interface OnStartListener {
+    fun onStart()
 }
