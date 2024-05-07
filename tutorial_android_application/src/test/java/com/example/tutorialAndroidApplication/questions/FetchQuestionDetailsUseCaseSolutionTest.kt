@@ -14,15 +14,13 @@ import org.mockito.Mock
 import org.mockito.Mockito.doAnswer
 import org.mockito.Mockito.`when`
 import org.mockito.junit.MockitoJUnitRunner
-import org.mockito.kotlin.mock
+import org.mockito.kotlin.anyOrNull
 
 @RunWith(MockitoJUnitRunner::class)
 class FetchQuestionDetailsUseCaseSolutionTest {
     // region helper fields ------------------------------------------------------------------------
-//    @Mock
-//    private lateinit var fetchQuestionDetailsEndpointMock: FetchQuestionDetailsEndpoint
-
-    var fetchQuestionDetailsEndpointMock = mock<FetchQuestionDetailsEndpoint>()
+    @Mock
+    private lateinit var fetchQuestionDetailsEndpointMock: FetchQuestionDetailsEndpoint
 
     @Mock
     private lateinit var timeProviderMock: TimeProvider
@@ -227,9 +225,7 @@ class FetchQuestionDetailsUseCaseSolutionTest {
             null
         }.`when`(fetchQuestionDetailsEndpointMock).fetchQuestionDetails(
             any(String::class.java),
-            any(
-                FetchQuestionDetailsEndpoint.Listener::class.java,
-            ),
+            anyOrNull(),
         )
     }
 
@@ -243,9 +239,7 @@ class FetchQuestionDetailsUseCaseSolutionTest {
             null
         }.`when`(fetchQuestionDetailsEndpointMock).fetchQuestionDetails(
             any(String::class.java),
-            any(
-                FetchQuestionDetailsEndpoint.Listener::class.java,
-            ),
+            anyOrNull(),
         )
     }
 
