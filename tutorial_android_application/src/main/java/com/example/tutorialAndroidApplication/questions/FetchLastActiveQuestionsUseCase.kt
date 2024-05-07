@@ -4,7 +4,7 @@ import com.example.tutorialAndroidApplication.common.BaseObservable
 import com.example.tutorialAndroidApplication.networking.questions.FetchLastActiveQuestionsEndpoint
 import com.example.tutorialAndroidApplication.networking.questions.QuestionSchema
 
-class FetchLastActiveQuestionsUseCase(private val fetchLastActiveQuestionsEndpoint: FetchLastActiveQuestionsEndpoint) :
+open class FetchLastActiveQuestionsUseCase(private val fetchLastActiveQuestionsEndpoint: FetchLastActiveQuestionsEndpoint?) :
     BaseObservable<FetchLastActiveQuestionsUseCase.Listener?>() {
     interface Listener {
         fun onLastActiveQuestionsFetched(questions: List<Question?>?)
@@ -12,8 +12,8 @@ class FetchLastActiveQuestionsUseCase(private val fetchLastActiveQuestionsEndpoi
         fun onLastActiveQuestionsFetchFailed()
     }
 
-    fun fetchLastActiveQuestionsAndNotify() {
-        fetchLastActiveQuestionsEndpoint.fetchLastActiveQuestions(
+    open fun fetchLastActiveQuestionsAndNotify() {
+        fetchLastActiveQuestionsEndpoint?.fetchLastActiveQuestions(
             object :
                 FetchLastActiveQuestionsEndpoint.Listener {
                 override fun onQuestionsFetched(questions: List<QuestionSchema?>?) {

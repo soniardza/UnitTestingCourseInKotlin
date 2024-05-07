@@ -5,9 +5,9 @@ import com.example.tutorialAndroidApplication.common.time.TimeProvider
 import com.example.tutorialAndroidApplication.networking.questions.FetchQuestionDetailsEndpoint
 import com.example.tutorialAndroidApplication.networking.questions.QuestionSchema
 
-class FetchQuestionDetailsUseCase(
-    private val fetchQuestionDetailsEndpoint: FetchQuestionDetailsEndpoint,
-    private val timeProvider: TimeProvider,
+open class FetchQuestionDetailsUseCase(
+    private val fetchQuestionDetailsEndpoint: FetchQuestionDetailsEndpoint?,
+    private val timeProvider: TimeProvider?,
 ) : BaseObservable<FetchQuestionDetailsUseCase.Listener?>() {
     interface Listener {
         fun onQuestionDetailsFetched(questionDetails: QuestionDetails)
@@ -17,20 +17,22 @@ class FetchQuestionDetailsUseCase(
 
     private val questionDetailsCache = mutableMapOf<String, QuestionDetailsCacheEntry>()
 
-    fun fetchQuestionDetailsAndNotify(questionId: String) {
+    open fun fetchQuestionDetailsAndNotify(questionId: String) {
         if (serveQuestionDetailsFromCacheIfValid(questionId)) {
             return
         }
-        fetchQuestionDetailsEndpoint.fetchQuestionDetails(
+        fetchQuestionDetailsEndpoint?.fetchQuestionDetails(
             questionId,
             object : FetchQuestionDetailsEndpoint.Listener {
                 override fun onQuestionDetailsFetched(question: QuestionSchema?) {
                     val cacheEntry =
-                        QuestionDetailsCacheEntry(
-                            schemaToQuestionDetails(question),
-                            timeProvider.getCurrentTimestamp(),
-                        )
-                    questionDetailsCache[questionId] = cacheEntry
+                        timeProvider?.getCurrentTimestamp()?.let {
+                            QuestionDetailsCacheEntry(
+                                schemaToQuestionDetails(question),
+                                it,
+                            )
+                        }
+                    questionDetailsCache[questionId] = cacheEntry as QuestionDetailsCacheEntry
                     notifySuccess(cacheEntry.questionDetails)
                 }
 
@@ -44,7 +46,7 @@ class FetchQuestionDetailsUseCase(
     private fun serveQuestionDetailsFromCacheIfValid(questionId: String): Boolean {
         val cachedQuestionDetailsEntry = questionDetailsCache[questionId]
         return if (cachedQuestionDetailsEntry != null &&
-            timeProvider.getCurrentTimestamp() < cachedQuestionDetailsEntry.cachedTimestamp + CACHE_TIMEOUT_MS
+            timeProvider?.getCurrentTimestamp()!! < cachedQuestionDetailsEntry.cachedTimestamp + CACHE_TIMEOUT_MS
         ) {
             notifySuccess(cachedQuestionDetailsEntry.questionDetails)
             true
