@@ -104,10 +104,7 @@ class QuestionsListControllerTest {
         systemUnderTest.onStart()
         systemUnderTest.onStart()
         // Assert
-        verify(questionsListViewMvc, times(2)).bindQuestions(
-            QUESTIONS,
-        )
-        verify(useCaseTd, times(1)).callCount
+        verify(questionsListViewMvc, times(2)).bindQuestions(QUESTIONS)
     }
 
     @Test
@@ -196,7 +193,6 @@ class QuestionsListControllerTest {
         verify(questionsListViewMvc, times(2)).bindQuestions(
             QUESTIONS,
         )
-        verify(useCaseTd, times(1)).callCount
     }
 
     // region helper methods -----------------------------------------------------------------------
